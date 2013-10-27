@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+	<title>HIVE</title>
+
+	<script type="text/javascript">
+		var config_socketio_server = "http://localhost:9000";
+	</script>
+
+	<script type="text/javascript" src="imclient.js"></script>
+	<script src="http://localhost:9000/socket.io/socket.io.js"></script>
+
+</head>
+<body>
+
+	<div>
+		<form id='loginForm'>
+			<input type='text' value='' placeholder='Username' id='username' name='username' />
+			<input type='password' value='' placeholder='password' id='password' name='password' /> 
+			<input type='submit' value='login'>
+		</form>
+	</div>
+
+	<div>
+		<form id="sendMsgForm">
+			<input type='text' value='' placeholder='to' id='msg_to' name='msg_to' />
+			<input type='text' value='' placeholder='txt' id='msg_txt' name='msg_txt' />
+			<input type='submit' value='send'>
+		</form>
+	</div>
+
+</body>
+</html>
