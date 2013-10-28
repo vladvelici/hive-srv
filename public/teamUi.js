@@ -36,6 +36,10 @@ var teamUi = {
 
 		dom.appendChild(document.createTextNode(name));
 
+		dom.onclick = function() {
+			msgWindows.open(name);
+		};
+
 		this._container.appendChild(dom);
 
 		return dom;

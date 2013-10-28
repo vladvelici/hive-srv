@@ -3,6 +3,8 @@ var msgUi = function (elem, person, sendCallback) {
 	this.elementId = elem.id;
 	this.person = person;
 	this.sendCallback = sendCallback;
+
+	this.renderLayout();
 }
 
 msgUi.prototype.renderLayout = function() {
@@ -18,13 +20,15 @@ msgUi.prototype.renderLayout = function() {
 
 	sendForm.onsubmit = function(e) {
 		e.preventDefault();
-		that.sendCallback(that.person, sendBox.value);
-		sendForm.reset();
+		// that.sendCallback(sendBox.value);
+		// sendForm.reset();
 	}
 
 	sendBox.onkeypress = function(e) {
 		if (e.keyCode === 13) {
-			sendForm.submit();
+			that.sendCallback(sendBox.value);
+			that.renderNewOutgoingMessage({from: "me", msg: sendBox.value});
+			sendForm.reset();
 		}
 	}
 
@@ -76,7 +80,7 @@ var msgWindows = {
 	_store: {},
 
 	open: function(name) {
-		if (this._store[name] !== undefined) {
+		if (this._store[name] === undefined) {
 			// open it
 			this._create(name);
 			this._store[name].dom.style.display = "block";
@@ -86,6 +90,8 @@ var msgWindows = {
 			this._store[name].dom.style.display = "block";
 			this._store[name].opened = true;
 		}
+
+		return this._store[name];
 	},
 
 	close: function(name) {
@@ -93,13 +99,13 @@ var msgWindows = {
 			this._store[name].dom.style.display = "none";
 			this._store[name].opened = false;
 		}
-	}
+	},
 
 	_create: function(name) {
 		var dom = document.createElement("div");
 		dom.id = "imBox-"+name;
 
-		var win = new msgUi(dom, person, function(msg) {
+		var win = new msgUi(dom, name, function(msg) {
 			sendMsg(name, msg);
 		});
 

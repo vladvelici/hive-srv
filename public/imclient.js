@@ -35,6 +35,11 @@ var Auth = {
 
 var sendMsg;
 
+var receivedMessage = function(from, message) {
+	var w = msgWindows.open(from);
+	w.win.renderNewIncomingMessage({from: from, msg: message});
+}
+
 window.addEventListener("load", function () {
 
 	console.log("something happening");
@@ -58,7 +63,7 @@ window.addEventListener("load", function () {
 	});
 
 	socket.on("message", function(data) {
-		console.log("received message", data);
+		receivedMessage(data.from, data.message);
 	});
 
 	socket.on("memberDisconnected", function(data) {

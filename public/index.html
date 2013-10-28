@@ -8,11 +8,17 @@
 		var config_socketio_server = "http://localhost:9000";
 	</script>
 
+	<script type="text/javascript" src='msgUi.js'></script>
 	<script type="text/javascript" src='teamUi.js'></script>
 	<script type="text/javascript" src="imclient.js"></script>
 	<script src="http://localhost:9000/socket.io/socket.io.js"></script>
 
 	<style type="text/css">
+
+	.person_online:hover, .person_offline:hover {
+		cursor: pointer;
+		text-decoration: underline;
+	}
 
 	.person_online {
 		color: #9f9;
@@ -22,6 +28,12 @@
 	.person_offline {
 		font-weight: normal;
 		color: #333;
+	}
+
+	.sender {
+		font-weight: bold;
+		display: inline-block;
+		padding-right: 7px;
 	}
 
 	</style>
@@ -47,7 +59,6 @@
 
 
 	<div id='team_container'>
-
 	</div>
 
 	<script type="text/javascript">
