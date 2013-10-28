@@ -9,6 +9,10 @@ var Auth = {
 		this.user = data.me;
 		this.teamMembers = data.team;
 
+		document.getElementById("loginForm").parentNode.appendChild(document.createTextNode(data.me.name));
+		document.getElementById("loginForm").style.display = "none";
+		this.user = data.me;
+
 		teamUi.addTeamMembers(data.team);
 	},
 
@@ -33,7 +37,9 @@ var Auth = {
 	}
 };
 
+
 var sendMsg;
+var sendGroupMsg;
 
 var receivedMessage = function(from, message) {
 	var w = msgWindows.open(from);
@@ -66,10 +72,16 @@ window.addEventListener("load", function () {
 		receivedMessage(data.from, data.message);
 	});
 
+	socket.on("groupMessage", function(data) {
+		console.log("groupMessage", data);
+	});
+
 	socket.on("memberDisconnected", function(data) {
 		console.log("memberDisconnected", data);
 		Auth.setOffine(data);
 	});
+
+
 
 	socket.on("memberConnected", function(data) {
 		console.log("memberConnected", data);
@@ -80,6 +92,14 @@ window.addEventListener("load", function () {
 
 		console.log("sending message", to, message);
 		socket.emit("sendMsg", {to: to, msg: message});
+
+	};
+
+	sendGroupMsg = function(to, message) {
+
+		console.log("sending message", to, message);
+		socket.emit("sendGroupMsg", {to: to, msg: message});
+
 	};
 
 	document.getElementById("loginForm").addEventListener("submit", function(e) {
@@ -90,15 +110,6 @@ window.addEventListener("load", function () {
 
 		Auth.loginReq(user, pass);
 	});
-
-	document.getElementById("sendMsgForm").addEventListener("submit", function(e) {
-		e.preventDefault();
-
-		var to = document.getElementById("msg_to").value;
-		var txt = document.getElementById("msg_txt").value;
-
-		sendMsg(to, txt);
-	})
 
 	console.log("Ready to roll.");
 });

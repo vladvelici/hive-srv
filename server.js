@@ -150,6 +150,28 @@ io.sockets.on("connection", function(socket) {
 		to.socket.emit("message", {from: me.name, message: data.msg});
 	});
 
+	socket.on("sendGroupMsg", function(data) {
+		if (me === null) return;
+
+		var dto = data.to;
+		var to = [];
+		var group = [];
+
+		for (var i in dto) {
+			var u = UserStore.findByName(dto[i]);
+			if (u !== null && u.socket !== null && u.team === me.team) {
+				to.push(u);
+				group.push(u.name);
+			}
+		}
+
+		group.push(me.name);
+
+		for (var i in to) {
+			to[i].socket.emit("groupMessage", {from: me.name, group: group, message: data.msg});
+		}
+	});
+
 	socket.on("disconnect", function() {
 		if (me !== null) {
 			me.disconnected();
