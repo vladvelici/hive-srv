@@ -17,7 +17,7 @@ var User = function(name, password, team) {
 	}
 	this.socket = null;
 
-	// console.log(this);
+	console.log(this);
 }
 
 User.prototype.save = function() {
@@ -27,10 +27,6 @@ User.prototype.save = function() {
 User.prototype.auth = function(pass) {
 	return this.password === pass;
 };
-
-User.prototype.sendMsg = function() {
-	
-}
 
 User.prototype.connected = function(s) {
 	this.socket = s;
@@ -105,6 +101,7 @@ var io = require('socket.io').listen(socketioPort);
 io.sockets.on("connection", function(socket) {
 
 	var me = null;
+	var myteam = null;
 
 	socket.on("authenticate", function(data) {
 		var u = UserStore.login(data.user, data.password);
@@ -112,6 +109,7 @@ io.sockets.on("connection", function(socket) {
 			u.connected(socket);
 
 			me = u;
+			myteam = UserStore.findByTeam(me.team, true);
 
 			socket.emit("auth_done", {
 				"ok": true,
@@ -121,7 +119,17 @@ io.sockets.on("connection", function(socket) {
 					team: me.team
 				}
 			});
+
+			for (var i in myteam) {
+				var j = myteam[i];
+				if (j.name !== me.name && j.socket !== null) {
+					j.socket.emit("memberConnected", {"name": me.name});
+				}
+			}
+
 		} else {
+			me = null;
+			myteam = null;
 			socket.emit("auth_done", {"ok": false, "err": "Wrong username or password."});
 		}
 	});
@@ -139,12 +147,18 @@ io.sockets.on("connection", function(socket) {
 			return;
 		}
 
-		to.socket.emit("message", data.msg);
+		to.socket.emit("message", {from: me.name, message: data.msg});
 	});
 
 	socket.on("disconnect", function() {
 		if (me !== null) {
 			me.disconnected();
+			for (var i in myteam) {
+				var j = myteam[i];
+				if (j.name !== me.name && j.socket !== null) {
+					j.socket.emit("memberDisconnected", {"name": me.name});
+				}
+			}
 		}
 	});
 

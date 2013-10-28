@@ -1,10 +1,35 @@
 console.log("file loaded");
+
 var Auth = {
 	user: null,
 	loginReq: null,
+	teamMembers: [],
+
 	loginRes: function(data) {
 		this.user = data.me;
-		this.teamMembers = data.team; 
+		this.teamMembers = data.team;
+
+		teamUi.addTeamMembers(data.team);
+	},
+
+	setOffine: function(data) {
+		for (var i in this.teamMembers) {
+			if (this.teamMembers[i].name == data.name) {
+				this.teamMembers[i].online = false;
+				teamUi.update(data.name, false);
+				return;
+			}
+		}
+	},
+
+	setOnline: function(data) {
+		for (var i in this.teamMembers) {
+			if (this.teamMembers[i].name == data.name) {
+				this.teamMembers[i].online = true;
+				teamUi.update(data.name, true);
+				return;
+			}
+		}
 	}
 };
 
@@ -34,6 +59,16 @@ window.addEventListener("load", function () {
 
 	socket.on("message", function(data) {
 		console.log("received message", data);
+	});
+
+	socket.on("memberDisconnected", function(data) {
+		console.log("memberDisconnected", data);
+		Auth.setOffine(data);
+	});
+
+	socket.on("memberConnected", function(data) {
+		console.log("memberConnected", data);
+		Auth.setOnline(data);
 	});
 
 	sendMsg = function(to, message) {

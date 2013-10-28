@@ -8,8 +8,23 @@
 		var config_socketio_server = "http://localhost:9000";
 	</script>
 
+	<script type="text/javascript" src='teamUi.js'></script>
 	<script type="text/javascript" src="imclient.js"></script>
 	<script src="http://localhost:9000/socket.io/socket.io.js"></script>
+
+	<style type="text/css">
+
+	.person_online {
+		color: #9f9;
+		font-weight: bold;
+	}
+
+	.person_offline {
+		font-weight: normal;
+		color: #333;
+	}
+
+	</style>
 
 </head>
 <body>
@@ -29,6 +44,15 @@
 			<input type='submit' value='send'>
 		</form>
 	</div>
+
+
+	<div id='team_container'>
+
+	</div>
+
+	<script type="text/javascript">
+		teamUi._init('team_container');
+	</script>
 
 </body>
 </html>
