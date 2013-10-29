@@ -119,24 +119,39 @@ window.addEventListener("load", function () {
 		localVidEl: null,
 		remoteVidEl: null,
 
-		initVideo: function() {
+		initVideo: function(done) {
 			this.localVidEl = document.getElementById('localVideoEl');
 			this.remoteVidEl = document.getElementById('removeVideoEl');
 			var that = this;
 			navigator.getUserMedia({video: true, audio: true}, function(stream) {
 				that.videoStream = stream;
-				
-			})
+				that.localVidEl.src = URL.createObjectURL(stream);
+
+				if (stream.getVideoTracks().length > 0) {
+					trace('Using video device: ' + stream.getVideoTracks()[0].label);
+				}
+				if (stream.getAudioTracks().length > 0) {
+					trace('Using audio device: ' + stream.getAudioTracks()[0].label);
+				}
+
+				if (done!==undefined) done();
+			}, function(err) {
+				console.log("getUserMedia error:", err);
+			});
 		},
 
 		call: function(name) {
 			this.pc = new RTCPeerConnection(null);
 			var that = this;
+			this.initVideo(function() {
 
-			this.pc.createOffer(function(desc) {
-				that.pc.setLocalDescription(desc);
-				that.awaitingAnswer = name;
-				socket.emit("initVideo", {to: name, rtcReq: desc});
+				that.pc 
+
+				that.pc.createOffer(function(desc) {
+					that.pc.setLocalDescription(desc);
+					that.awaitingAnswer = name;
+					socket.emit("initVideo", {to: name, rtcReq: desc});
+				});
 			});
 		},
 
@@ -145,12 +160,14 @@ window.addEventListener("load", function () {
 				this.pc = new RTCPeerConnection(null);
 
 			var that=this;
+			this.initVideo(function() {
+				that.addStream()
+				that.pc.setRemoteDescription = rtcReq;
 
-			this.pc.setRemoteDescription = rtcReq;
-
-			this.pc.createAnswer(function(desc) {
-				that.pc.setLocalDescription = desc;
-				socket.emit("answerVideo", {to: name, rtcRes: desc});
+				that.pc.createAnswer(function(desc) {
+					that.pc.setLocalDescription = desc;
+					socket.emit("answerVideo", {to: name, rtcRes: desc});
+				});
 			});
 
 		}
