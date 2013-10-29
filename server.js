@@ -172,6 +172,39 @@ io.sockets.on("connection", function(socket) {
 		}
 	});
 
+	socket.on("initVideo", function(data) {
+		if (me === null) return;
+
+		var to = UserStore.findByName(data.to);
+
+		if (to === null || to.socket === null) {
+			return;
+		}
+
+		if (to.team !== me.team) { 
+			return;
+		}
+
+		to.socket.emit("incomingCall", {from: me.name, rtcReq: data.rtcReq});		
+	});
+
+	socket.on("answerVideo", function(data) {
+		if (me === null) return;
+
+		var to = UserStore.findByName(data.to);
+
+		if (to === null || to.socket === null) {
+			return;
+		}
+
+		if (to.team !== me.team) {
+			return;
+		}
+
+		to.socket.emit("answerCall", {from: me.name, rtcRes: data.rtcRes});		
+
+	});
+
 	socket.on("disconnect", function() {
 		if (me !== null) {
 			me.disconnected();

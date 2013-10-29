@@ -40,6 +40,7 @@ var Auth = {
 
 var sendMsg;
 var sendGroupMsg;
+var videocall;
 
 var receivedMessage = function(from, message) {
 	var w = msgWindows.open(from);
@@ -109,6 +110,72 @@ window.addEventListener("load", function () {
 		var pass = document.getElementById("password").value;
 
 		Auth.loginReq(user, pass);
+	});
+
+	videocall = {
+		pc: null,
+		awaitingAnswer: false,
+		videoStream: null,
+		localVidEl: null,
+		remoteVidEl: null,
+
+		initVideo: function() {
+			this.localVidEl = document.getElementById('localVideoEl');
+			this.remoteVidEl = document.getElementById('removeVideoEl');
+			var that = this;
+			navigator.getUserMedia({video: true, audio: true}, function(stream) {
+				that.videoStream = stream;
+				
+			})
+		},
+
+		call: function(name) {
+			this.pc = new RTCPeerConnection(null);
+			var that = this;
+
+			this.pc.createOffer(function(desc) {
+				that.pc.setLocalDescription(desc);
+				that.awaitingAnswer = name;
+				socket.emit("initVideo", {to: name, rtcReq: desc});
+			});
+		},
+
+		sendAnswer: function(name, rtcReq) {
+			if (this.pc === null)
+				this.pc = new RTCPeerConnection(null);
+
+			var that=this;
+
+			this.pc.setRemoteDescription = rtcReq;
+
+			this.pc.createAnswer(function(desc) {
+				that.pc.setLocalDescription = desc;
+				socket.emit("answerVideo", {to: name, rtcRes: desc});
+			});
+
+		}
+
+		gotAnswer: function(name, rtcRes) {
+			if (this.awaitingAnswer !== name) {
+				return;
+			}
+
+			this.pc.setRemoteDescription(rtcRes);
+
+			this.awaitingAnswer = false;
+		}
+	}
+
+
+	socket.on("incomingCall", function(data) {
+		var answer = confirm("Incoming call from " + data.from + "\nAnswer?");
+		if (answer === false) return;
+
+		videocall.sendAnswer(data.from, data.rtcReq);
+	});
+
+	socket.on("answerCall", function(data) {
+		gotAnswer(data.from, data.rtcRes);
 	});
 
 	console.log("Ready to roll.");
