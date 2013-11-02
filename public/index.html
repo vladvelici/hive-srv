@@ -40,10 +40,27 @@
 
 	.imBox {
 		border: 1px solid #999;
+		width: 180px;
+		margin: 10px;
+		padding: 4px;
+		float: left;
+		height: 200px;
 	}
 
 	.msgBox {
-		min-height: 100px;
+		height: 160px;
+		overflow-y: scroll;
+	}
+
+	.imBoxTitleBar {
+		background: #ddd;
+		color: #333;
+		font-weight: bold;
+	}
+
+	.imBoxTitleBar a {
+		display: inline-block;
+		float: right;
 	}
 
 	</style>
@@ -59,23 +76,7 @@
 		</form>
 	</div>
 
-<!-- 	<div>
-		<form id="sendMsgForm">
-			<input type='text' value='' placeholder='to' id='msg_to' name='msg_to' />
-			<input type='text' value='' placeholder='txt' id='msg_txt' name='msg_txt' />
-			<input type='submit' value='send'>
-		</form>
-	</div>
- -->
-
 	<div id='team_container'>
-	</div>
-
-	<div>
-		<h2>local</h2>
-		<video id='localVideoEl' width='100' height='100'></video>
-		<h2>remote</h2>
-		<video id='remoteVideoEl' width='100' height='100'></video>
 	</div>
 
 	<script type="text/javascript">

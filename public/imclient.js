@@ -9,7 +9,10 @@ var Auth = {
 		this.user = data.me;
 		this.teamMembers = data.team;
 
-		document.getElementById("loginForm").parentNode.appendChild(document.createTextNode(data.me.name));
+		var myname = document.createElement("h1");
+		myname.appendChild(document.createTextNode(data.me.name));
+		myname.className = "myname";
+		document.getElementById("loginForm").parentNode.appendChild(myname);
 		document.getElementById("loginForm").style.display = "none";
 		this.user = data.me;
 
@@ -39,7 +42,6 @@ var Auth = {
 
 
 var sendMsg;
-var sendGroupMsg;
 var videocall;
 
 var receivedMessage = function(from, message) {
@@ -93,13 +95,6 @@ window.addEventListener("load", function () {
 
 		console.log("sending message", to, message);
 		socket.emit("sendMsg", {to: to, msg: message});
-
-	};
-
-	sendGroupMsg = function(to, message) {
-
-		console.log("sending message", to, message);
-		socket.emit("sendGroupMsg", {to: to, msg: message});
 
 	};
 

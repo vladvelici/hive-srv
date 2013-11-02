@@ -67,14 +67,19 @@ msgUi.prototype.renderNewIncomingMessage = function(msg) {
 	var msgDom = this.renderMessageObj(msg);
 	msg.className = "incomingMessage";
 	this.msgBox.appendChild(msgDom);
+	this.fixScroll();
 };
 
 msgUi.prototype.renderNewOutgoingMessage = function(msg) {
 	var msgDom = this.renderMessageObj(msg);
 	msg.className = "incomingMessage";
 	this.msgBox.appendChild(msgDom);
+	this.fixScroll();
 };
 
+msgUi.prototype.fixScroll = function() {
+	this.element.scrollTop = this.element.scrollHeight;
+}
 
 var msgWindows = {
 	_store: {},
@@ -104,6 +109,24 @@ var msgWindows = {
 	_create: function(name) {
 		var dom = document.createElement("div");
 		dom.id = "imBox-"+name;
+
+		var that = this;
+
+		var titl = document.createElement("div");
+		titl.className = "imBoxTitleBar";
+		var closebtn = document.createElement("a");
+		closebtn.href = "javascript:void(0)";
+		closebtn.onclick = function() {
+			that.close(name);
+		};
+
+		closebtn.appendChild(document.createTextNode("x"));
+
+		titl.appendChild(closebtn);
+
+		titl.appendChild(document.createTextNode(name));
+
+		dom.appendChild(titl);
 
 		var win = new msgUi(dom, name, function(msg) {
 			sendMsg(name, msg);
