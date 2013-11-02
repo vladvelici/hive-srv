@@ -87,6 +87,9 @@ a.save();
 a = new User("radu", "radu", "team1");
 a.save();
 
+a = new User("waleed", "waleed", "team1");
+a.save();
+
 delete a;
 
 // server work starts here

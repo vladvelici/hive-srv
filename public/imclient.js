@@ -123,7 +123,7 @@ window.addEventListener("load", function () {
 			this.localVidEl = document.getElementById('localVideoEl');
 			this.remoteVidEl = document.getElementById('removeVideoEl');
 			var that = this;
-			navigator.getUserMedia({video: true, audio: true}, function(stream) {
+			getUserMedia({video: true, audio: true}, function(stream) {
 				that.videoStream = stream;
 				that.localVidEl.src = URL.createObjectURL(stream);
 
@@ -141,15 +141,20 @@ window.addEventListener("load", function () {
 		},
 
 		call: function(name) {
+			console.log("calling", name);
+
 			this.pc = new RTCPeerConnection(null);
 			var that = this;
 			this.initVideo(function() {
-
-				that.pc 
+				that.pc.addStream(that.videoStream);
 
 				that.pc.createOffer(function(desc) {
 					that.pc.setLocalDescription(desc);
+
 					that.awaitingAnswer = name;
+
+					console.log("sent initVideo");
+
 					socket.emit("initVideo", {to: name, rtcReq: desc});
 				});
 			});
@@ -159,23 +164,30 @@ window.addEventListener("load", function () {
 			if (this.pc === null)
 				this.pc = new RTCPeerConnection(null);
 
+			console.log("sendAnswer ", name, rtcReq);
+
 			var that=this;
 			this.initVideo(function() {
-				that.addStream()
-				that.pc.setRemoteDescription = rtcReq;
+
+				that.pc.addStream(that.videoStream);
+
+				that.pc.setRemoteDescription(rtcReq);
 
 				that.pc.createAnswer(function(desc) {
 					that.pc.setLocalDescription = desc;
+					console.log("sent answerVideo");
 					socket.emit("answerVideo", {to: name, rtcRes: desc});
 				});
 			});
 
-		}
+		},
 
 		gotAnswer: function(name, rtcRes) {
 			if (this.awaitingAnswer !== name) {
 				return;
 			}
+
+			console.log("gotAnswer", name, rtcRes);
 
 			this.pc.setRemoteDescription(rtcRes);
 
