@@ -67,5 +67,13 @@ var UserStore = {
 
 }
 
+UserStore.add(new User("vlad", "vlad", "team1"));
+UserStore.add(new User("river", "river", "team1"));
+UserStore.add(new User("george", "george", "team1"));
+
+UserStore.add(new User("radu", "radu", "team2"));
+UserStore.add(new User("sina", "sina", "team2"));
+
+
 exports.user = User;
 exports.store = UserStore;

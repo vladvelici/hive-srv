@@ -47,71 +47,37 @@ io.sockets.on("connection", function(socket) {
 	socket.on("sendMsg", function(data) {
 		if (me === null) return;
 
-		var to = um.store.findByName(data.to);
+		var sendIt = function(d, group) {
+			var r = {
+				from: me.name,
+				message: d.msg
+			}
+			if (group) r.group = group;
 
-		if (to === null || to.socket === null) {
-			return;
+			d.to.socket.emit("message", r);
 		}
 
-		if (to.team !== me.team) { 
-			return;
-		}
+		if (typeof data.to === 'string') {
+			var to = um.store.findByName(data.to);
+			if (to !== null && to.socket !== null && to.team === me.team) {
+				sendIt({to: to, msg: data.msg});
+			}
+		} else {
+			var dto = data.to;
+			var group = [];
+			var gs = [];
+			for (var i in dto) {
+				var to = um.store.findByName(dto[i]);
+				if (to !== null && to.socket !== null && to.team === me.team) {
+					group.push(to.name);
+					gs.push(to);
+				}
+			}
 
-		to.socket.emit("message", {from: me.name, message: data.msg});
-	});
-
-	socket.on("sendGroupMsg", function(data) {
-		if (me === null) return;
-
-		var dto = data.to;
-		var to = [];
-		var group = [];
-
-		for (var i in dto) {
-			var u = um.store.findByName(dto[i]);
-			if (u !== null && u.socket !== null && u.team === me.team) {
-				to.push(u);
-				group.push(u.name);
+			for (var i in group) {
+				sendIt({to: gs[i], msg: data.msg}, group);
 			}
 		}
-
-		group.push(me.name);
-
-		for (var i in to) {
-			to[i].socket.emit("groupMessage", {from: me.name, group: group, message: data.msg});
-		}
-	});
-
-	socket.on("initVideo", function(data) {
-		if (me === null) return;
-
-		var to = um.store.findByName(data.to);
-
-		if (to === null || to.socket === null) {
-			return;
-		}
-
-		if (to.team !== me.team) { 
-			return;
-		}
-
-		to.socket.emit("incomingCall", {from: me.name, rtcReq: data.rtcReq});		
-	});
-
-	socket.on("answerVideo", function(data) {
-		if (me === null) return;
-
-		var to = um.store.findByName(data.to);
-
-		if (to === null || to.socket === null) {
-			return;
-		}
-
-		if (to.team !== me.team) {
-			return;
-		}
-
-		to.socket.emit("answerCall", {from: me.name, rtcRes: data.rtcRes});		
 
 	});
 
