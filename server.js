@@ -7,6 +7,7 @@ var socketioPort = 9000;
 var um = require('./users');
 
 var io = require('socket.io').listen(socketioPort);
+var cpClipboard = "";
 
 io.sockets.on("connection", function(socket) {
 
@@ -42,6 +43,14 @@ io.sockets.on("connection", function(socket) {
 			myteam = null;
 			socket.emit("auth_done", {"ok": false, "err": "Wrong username or password."});
 		}
+	});
+
+	socket.on("cp:copy", function(data) {
+		cpClipboard = data;
+	});
+
+	socket.on("cp:paste", function(data) {
+		socket.emit("cp:text", cpClipboard);
 	});
 
 	socket.on("sendMsg", function(data) {
