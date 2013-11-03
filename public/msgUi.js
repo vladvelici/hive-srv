@@ -101,7 +101,7 @@ msgUi.prototype.renderNewOutgoingMessage = function(msg) {
 };
 
 msgUi.prototype.fixScroll = function() {
-	this.element.scrollTop = this.element.scrollHeight;
+	this.msgBox.scrollTop = this.msgBox.scrollHeight;
 }
 
 var msgWindows = {
