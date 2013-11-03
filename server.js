@@ -1,14 +1,39 @@
 
 var fs = require('fs');
+var http = require('http');
+var https = require('https');
+var express = require('express');
 
-var staticFilesPort = process.env.PORT || 8000;
-var socketioPort = 9000;
+
+var srvPort = process.env.PORT || 8000;
+
+var app = express();
+
 
 var um = require('./users');
 
-var io = require('socket.io').listen(socketioPort);
-var cpClipboard = "";
 
+function defaultRequestHandler (req, res) {
+	res.writeHead(200, {'Content-Type': 'text/html'});
+	var page = fs.readFileSync('./public/index.html', 'utf8');
+	res.write(page);
+	res.end();
+	console.log("Default page served");
+}
+
+app.use(express.bodyParser());
+
+app.get('/', defaultRequestHandler);
+app.use('/p', express.static(__dirname + '/public'));
+
+var httpServer = http.createServer(app);
+httpServer.listen(srvPort);
+
+var io = require('socket.io').listen(httpServer);
+
+// huddleProxy.attach(app, 'Bens%20Huddle%20hacks', 'localhost:8000', defaultRequestHandler);
+
+var cpClipboard = "";
 io.sockets.on("connection", function(socket) {
 
 	var me = null;
@@ -104,14 +129,5 @@ io.sockets.on("connection", function(socket) {
 
 });
 
-// Static file server:
-var connect = require('connect'),
-    http = require('http');
-
-connect()
-	.use(connect.static('public'))
-	.listen(staticFilesPort);
-
 // Nice greeting so you know it works:
-console.log("Server started at http://localhost:" + staticFilesPort);
-console.log("Socket.io is on port " + socketioPort);
+console.log("Server started on port " + srvPort);
