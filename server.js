@@ -116,6 +116,45 @@ io.sockets.on("connection", function(socket) {
 
 	});
 
+	socket.on("sendFile", function(data) {
+		if (me === null) return;
+
+		var sendIt = function(d, group) {
+			var r = {
+				from: me.name,
+				file: d.file,
+				fileName: d.fileName
+			}
+			if (group) r.group = group;
+
+			d.to.socket.emit("file", r);
+		}
+
+		if (typeof data.to === 'string') {
+			var to = um.store.findByName(data.to);
+			if (to !== null && to.socket !== null && to.team === me.team) {
+				sendIt({to: to, file: data.file, fileName: data.fileName});
+			}
+		} else {
+			var dto = data.to;
+			var group = [];
+			var gs = [];
+			for (var i in dto) {
+				var to = um.store.findByName(dto[i]);
+				if (to !== null && to.socket !== null && to.team === me.team) {
+					group.push(to.name);
+					gs.push(to);
+				}
+			}
+
+			for (var i in group) {
+				sendIt({to: gs[i], file: data.file, fileName: data.fileName}, group);
+			}
+		}
+
+	});
+
+
 	socket.on("disconnect", function() {
 		if (me !== null) {
 			me.disconnected();
