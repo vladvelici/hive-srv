@@ -48,11 +48,15 @@ var receivedMessage = function(from, message) {
 	w.win.renderNewIncomingMessage({from: from, msg: message});
 }
 
+var _socket;
+
 window.addEventListener("load", function () {
 
 	console.log("something happening");
 
 	var socket = io.connect(config_socketio_server);
+
+	_socket = socket;
 
 	Auth.loginReq = function(user, pass) {
 
@@ -68,6 +72,10 @@ window.addEventListener("load", function () {
 		} else {
 			console.log("Authentication failed.");
 		}
+	});
+
+	socket.on("cp:clipboard", function(data) {
+		console.log("cp:clipboard received", data);
 	});
 
 	socket.on("message", function(data) {

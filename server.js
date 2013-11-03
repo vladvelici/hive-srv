@@ -72,6 +72,7 @@ io.sockets.on("connection", function(socket) {
 
 	socket.on("cp:copy", function(data) {
 		cpClipboard = data;
+		io.sockets.emit("cp:clipboard", data);
 	});
 
 	socket.on("cp:paste", function(data) {
