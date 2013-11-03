@@ -40,7 +40,6 @@ var Auth = {
 	}
 };
 
-
 var sendMsg;
 var videocall;
 
@@ -83,8 +82,6 @@ window.addEventListener("load", function () {
 		console.log("memberDisconnected", data);
 		Auth.setOffine(data);
 	});
-
-
 
 	socket.on("memberConnected", function(data) {
 		console.log("memberConnected", data);

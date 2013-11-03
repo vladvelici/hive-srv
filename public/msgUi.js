@@ -1,3 +1,15 @@
+function stringCountChar(str, c) {
+	count = 0;
+	pos = str.indexOf(c);
+
+	while ( pos != -1 ) {
+		count++;
+		pos = str.indexOf(c,pos + 1 );
+	}
+
+	return count;
+}
+
 var msgUi = function (elem, person, sendCallback) {
 	this.element = elem;
 	this.elementId = elem.id;
@@ -47,18 +59,29 @@ msgUi.prototype.renderLayout = function() {
 };
 
 msgUi.prototype.renderMessageObj = function(msg) {
+	
 	var msgDom = document.createElement("div");
 
 	var sender = document.createElement("span");
 	sender.className = "sender";
 	sender.appendChild(document.createTextNode(msg.from));
 
-	var message = document.createElement("span");
-	message.className = "actualMessage";
+	// check if code
+	var code = false; var closing = stringCountChar(msg.msg, "}")
+	if (stringCountChar(msg.msg, "{") === closing && closing != 0) {
+		code = true;
+	}
+
+	var message = document.createElement(code ? "pre" : "span");
+	message.className = code ? "codeMessage" : "actualMessage";
 	message.appendChild(document.createTextNode(msg.msg));
 
 	msgDom.appendChild(sender);
 	msgDom.appendChild(message);
+
+	if (code) {
+		hljs.highlightBlock(message);
+	}
 
 	return msgDom;
 };
